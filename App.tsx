@@ -1,20 +1,36 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Navigation } from './components/Navigation';
+import { RootSiblingParent } from 'react-native-root-siblings';
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+import { useCallback } from 'react';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+SplashScreen.preventAutoHideAsync();
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const App = () => {
+	const [fontsLoaded] = useFonts({
+		'Inter-Regular': require('./assets/fonts/Inter-Regular.ttf'),
+		'Inter-Medium': require('./assets/fonts/Inter-Medium.ttf'),
+		'Inter-Bold': require('./assets/fonts/Inter-Bold.ttf')
+	});
+
+	const onLayoutRootView = useCallback(async () => {
+		if (fontsLoaded) {
+			await SplashScreen.hideAsync();
+		}
+	}, [fontsLoaded]);
+
+	if (!fontsLoaded) {
+		return null;
+	}
+
+	return (
+		<GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
+			<RootSiblingParent>
+				<Navigation />
+			</RootSiblingParent>
+		</GestureHandlerRootView>
+	);
+};
+
+export default App;
